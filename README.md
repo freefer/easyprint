@@ -436,12 +436,12 @@ dotnet publish -c Release -r win-x64 --self-contained true
 
 **安装：**
 ```bash
-npm install @chenghf/easyprint
+npm install @easyprint/js
 ```
 
 **基本用法：**
 ```typescript
-import { EasyPrintClient } from '@chenghf/easyprint';
+import { EasyPrintClient } from '@easyprint/js';
 
 const client = new EasyPrintClient({
   host: '127.0.0.1',
@@ -491,7 +491,7 @@ export const environment = {
 ```typescript
 import { Injectable, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs';
-import { EasyPrintClient, PrintResponse } from '@chenghf/easyprint';
+import { EasyPrintClient, PrintResponse } from '@easyprint/js';
 import { environment } from 'src/environments/environment';
 
 @Injectable({ providedIn: 'root' })
