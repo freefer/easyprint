@@ -1,0 +1,89 @@
+# ────────────────────────────────────────────────────────────────────────────
+# C# / .NET
+# ────────────────────────────────────────────────────────────────────────────
+
+# 编译输出
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio 用户配置（机器级，不应提交）
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+
+# NuGet 包缓存（可由 restore 重建）
+packages/
+*.nupkg
+*.snupkg
+[Pp]ackages/
+!*.[Cc]s[Pp]roj
+
+# 发布输出
+[Pp]ublish/
+[Pp]ublish[Oo]utput/
+
+# 覆盖率 & 测试
+*.coverage
+*.coveragexml
+TestResults/
+
+# .NET 工具安装清单（可选：保留或忽略，视团队约定）
+# .config/dotnet-tools.json
+
+# ────────────────────────────────────────────────────────────────────────────
+# easyprint-js（Node.js npm 库）
+# ────────────────────────────────────────────────────────────────────────────
+
+# 依赖（npm install 可重建）
+easyprint-js/node_modules/
+
+# 构建产物（npm run build 可重建）
+easyprint-js/dist/
+
+# 调试日志
+easyprint-js/npm-debug.log*
+easyprint-js/yarn-debug.log*
+easyprint-js/yarn-error.log*
+easyprint-js/.pnpm-debug.log*
+
+# 打包临时文件
+easyprint-js/*.tgz
+easyprint-js/.npmrc
+
+# ────────────────────────────────────────────────────────────────────────────
+# 操作系统 & 编辑器
+# ────────────────────────────────────────────────────────────────────────────
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+
+# JetBrains IDE
+.idea/
+
+# VS Code（保留 .vscode/extensions.json 等团队共享配置，忽略个人设置）
+.vscode/settings.json
+.vscode/launch.json
+.vscode/*.code-workspace
+
+# Cursor
+.cursor/
+
+# ────────────────────────────────────────────────────────────────────────────
+# 敏感 & 运行时文件
+# ────────────────────────────────────────────────────────────────────────────
+
+# 应用运行时数据（配置、打印缓存）
+**/data/
+**/puppeteer_cache/
+
+# 环境变量文件
+*.env
+*.env.local
+.env.*
+!.env.example

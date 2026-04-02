@@ -1,0 +1,35 @@
+{
+  "name": "@easyprint/js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "version": "1.0.0",
+  "description": "EasyPrint WebSocket client — browser label printing via local print service",
+  "author": "ShiFang Tech",
+  "license": "MIT",
+  "keywords": ["easyprint", "print", "websocket", "label", "browser-print"],
+
+  "main":   "dist/index.cjs",
+  "module": "dist/index.js",
+  "types":  "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types":   "./dist/index.d.ts",
+      "import":  "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+
+  "files": ["dist", "README.md"],
+
+  "scripts": {
+    "build":   "tsup",
+    "dev":     "tsup --watch",
+    "prepublishOnly": "npm run build"
+  },
+
+  "devDependencies": {
+    "tsup":       "^8.4.0",
+    "typescript": "^5.8.0"
+  }
+}
