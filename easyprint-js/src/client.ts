@@ -2,6 +2,7 @@ import type {
   ConnectionState,
   EasyPrintEventMap,
   EasyPrintOptions,
+  PrinterInfo,
   PrintJobRequest,
   PrintResponse,
 } from './types';
@@ -178,21 +179,55 @@ export class EasyPrintClient extends TypedEmitter<EasyPrintEventMap> {
     this.send(message);
   }
 
-  // ── 私有方法 ─────────────────────────────────────────────────────────────
+  // ── LIST ─────────────────────────────────────────────────────────────────
 
-  private setState(state: ConnectionState): void {
-    if (this._state === state) return;
-    this._state = state;
-    this.emit('stateChange', state);
+  /**
+   * 请求服务端枚举本机所有已安装的打印机。
+   *
+   * 服务端返回 `command = "LIST"` 的响应，`data` 字段为 `PrinterInfo[]` 的 JSON 字符串。
+   *
+   * @example
+   * ```ts
+   * client.on('response', resp => {
+   *   if (resp.command === 'LIST' && resp.status === 200) {
+   *     const printers: PrinterInfo[] = JSON.parse(resp.data ?? '[]');
+   *     console.log(printers);
+   *   }
+   * });
+   * client.list();
+   * ```
+   */
+  list(): void {
+    // C# LIST 命令无需 JSON 体，直接发送命令字符串
+    this.send('LIST');
   }
 
-  private send(message: string): void {
+  // ── 底层发送 ─────────────────────────────────────────────────────────────
+
+  /**
+   * 向服务端发送原始字符串帧。
+   *
+   * 若当前未连接，消息会进入等待队列，重连成功后自动重发。
+   * 通常应优先使用 `print()` / `list()` 等高层方法；
+   * 仅在需要发送自定义命令时才直接调用此方法。
+   *
+   * @param message 遵循服务端协议的原始消息，格式为 `命令 <JSON>` 或纯命令字符串
+   */
+  send(message: string): void {
     if (this.ws?.readyState === WebSocket.OPEN) {
       this.ws.send(message);
     } else {
       this.pendingQueue.push(message);
       this.emit('queued', message, this.pendingQueue.length);
     }
+  }
+
+  // ── 私有方法 ─────────────────────────────────────────────────────────────
+
+  private setState(state: ConnectionState): void {
+    if (this._state === state) return;
+    this._state = state;
+    this.emit('stateChange', state);
   }
 
   private connect(): void {

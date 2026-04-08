@@ -52,12 +52,36 @@ export interface PrintJobRequest {
 // ── 服务端响应（对应 C# PrintResponseMessage）────────────────────────────────
 
 export interface PrintResponse {
+  /** 触发本次响应的命令，如 "PRINT" / "LIST" */
+  command?: string;
   /** 200 = 成功 / 400 = 请求参数错误 / 500 = 服务器错误 */
   status: number;
   /** 可读的结果描述 */
   message: string;
-  /** 服务端生成的任务 ID 或附加数据 */
+  /** 服务端生成的任务 ID 或附加数据（JSON 字符串） */
   data?: string;
+}
+
+// ── LIST 命令相关类型 ─────────────────────────────────────────────────────────
+
+/**
+ * 打印机信息条目，对应 C# `LIST` 命令 `data` 字段反序列化后的单个元素。
+ *
+ * 使用示例：
+ * ```ts
+ * client.on('response', resp => {
+ *   if (resp.command === 'LIST' && resp.status === 200) {
+ *     const printers: PrinterInfo[] = JSON.parse(resp.data ?? '[]');
+ *   }
+ * });
+ * client.list();
+ * ```
+ */
+export interface PrinterInfo {
+  /** 打印机名称 */
+  name: string;
+  /** 是否为系统默认打印机 */
+  isDefault: boolean;
 }
 
 // ── 事件映射（强类型事件系统）──────────────────────────────────────────────
