@@ -8,10 +8,12 @@ namespace EasyPrint.Command
     {
         public StringPackageInfo Map(WebSocketPackage package)
         {
+
             var pack = new StringPackageInfo();
             var arr = package.Message.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
             pack.Key = arr[0];
-            pack.Parameters = arr.Skip(1).ToArray();
+            if (arr.Length > 1)
+                pack.Parameters = arr.Skip(1).ToArray();
             return pack;
         }
     }

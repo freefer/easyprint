@@ -46,6 +46,7 @@ namespace EasyPrint
             })
             .UseCommand<StringPackageInfo, JsonPackageConverter>(commandOptions =>
             {
+                commandOptions.AddCommand<LIST>();
                 commandOptions.AddCommand<PRINT>();
             })
             .UseInProcSessionContainer()
