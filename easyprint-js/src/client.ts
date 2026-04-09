@@ -171,6 +171,7 @@ export class EasyPrintClient extends TypedEmitter<EasyPrintEventMap> {
       context:     job.context,
       widthMm:     job.widthMm  ?? 76,
       heightMm:    job.heightMm ?? 130,
+      paddingMm:   job.paddingMm ?? [0, 0, 0, 0],
     };
 
     // 格式：命令 + 一个空格 + 紧凑 JSON

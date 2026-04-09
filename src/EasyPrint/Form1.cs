@@ -466,12 +466,32 @@ namespace EasyPrint
         private void btnClearCompleted_Click(object sender, EventArgs e)
         {
             // 先从视图移除（避免触发多余的 ListChanged 通知）
-            var completed = _allJobs.Where(j => j.Status == PrintJobStatus.Completed).ToList();
+            var completed = _allJobs.Where(j => j.Status == PrintJobStatus.Pending).ToList();
             foreach (var job in completed)
             {
                 _allJobs.Remove(job);
                 _displayJobs.Remove(job);
             }
+            UpdateStats();
+        }
+
+        private void btnClearAll_Click(object sender, EventArgs e)
+        {
+            if (_allJobs.Count == 0) return;
+
+            var result = MessageBox.Show(
+                $"确定要清空全部 {_allJobs.Count} 条任务记录吗？\n此操作不可撤销。",
+                "EasyPrint",
+                MessageBoxButtons.OKCancel,
+                MessageBoxIcon.Warning);
+
+            if (result != DialogResult.OK) return;
+
+            _displayJobs.RaiseListChangedEvents = false;
+            _displayJobs.Clear();
+            _allJobs.Clear();
+            _displayJobs.RaiseListChangedEvents = true;
+            _displayJobs.ResetBindings();
             UpdateStats();
         }
 

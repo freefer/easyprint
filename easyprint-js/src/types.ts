@@ -47,6 +47,8 @@ export interface PrintJobRequest {
   widthMm?: number;
   /** 标签高度（毫米），默认 130 */
   heightMm?: number;
+  /** 页面填充（或边距），单位：毫米，默认 0 0 0 0 表示上右下左 */
+  paddingMm?: number[];
 }
 
 // ── 服务端响应（对应 C# PrintResponseMessage）────────────────────────────────
@@ -58,8 +60,8 @@ export interface PrintResponse {
   status: number;
   /** 可读的结果描述 */
   message: string;
-  /** 服务端生成的任务 ID 或附加数据（JSON 字符串） */
-  data?: string;
+  /** 服务端生成的任务 ID 或附加数据 */
+  data?: any;
 }
 
 // ── LIST 命令相关类型 ─────────────────────────────────────────────────────────

@@ -46,7 +46,7 @@ namespace EasyPrint.Command
                     command = "LIST",
                     status  = 200,
                     message = $"共 {printers.Count} 台打印机",
-                    data    = JsonConvert.SerializeObject(printers)
+                    data    = printers
                 });
             }
             catch (Exception ex)

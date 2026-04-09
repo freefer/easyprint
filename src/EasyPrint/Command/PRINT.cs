@@ -65,10 +65,10 @@ namespace EasyPrint.Command
                 PrintBackground = true,    // 打印背景图和颜色
                 MarginOptions = new MarginOptions  // 设置边距
                 {
-                    Top = "0",
-                    Right = "0",
-                    Bottom = "0",
-                    Left = "0"
+                    Top = $"{job.PaddingMm[0]}mm",
+                    Right = $"{job.PaddingMm[1]}mm",
+                    Bottom = $"{job.PaddingMm[2]}mm",
+                    Left = $"{job.PaddingMm[3]}mm"
                 },
                 PreferCSSPageSize = false  // 不使用CSS中的@page尺寸
             });

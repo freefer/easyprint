@@ -62,8 +62,12 @@ namespace EasyPrint
             panelJobActions = new Panel();
             btnRetry = new ReaLTaiizor.Controls.MaterialButton();
             btnClearCompleted = new ReaLTaiizor.Controls.MaterialButton();
+            btnClearAll = new ReaLTaiizor.Controls.MaterialButton();
             panelHistoryHeader = new ReaLTaiizor.Controls.Panel();
             lblHistoryTitle = new ReaLTaiizor.Controls.LabelEdit();
+            btnFilterAll = new Button();
+            btnFilterPending = new Button();
+            btnFilterFailed = new Button();
             separator2 = new ReaLTaiizor.Controls.Separator();
             panelBottom = new ReaLTaiizor.Controls.Panel();
             rtbLog = new RichTextBox();
@@ -74,9 +78,6 @@ namespace EasyPrint
             panelStatusRow = new Panel();
             lblStatus = new ReaLTaiizor.Controls.LabelEdit();
             lostSeparator2 = new ReaLTaiizor.Controls.LostSeparator();
-            btnFilterAll     = new Button();
-            btnFilterPending = new Button();
-            btnFilterFailed  = new Button();
             panelTopActions.SuspendLayout();
             panelMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainerMain).BeginInit();
@@ -363,32 +364,61 @@ namespace EasyPrint
             panelStats.Name = "panelStats";
             panelStats.Size = new Size(278, 168);
             panelStats.TabIndex = 4;
-            SetupStatLabel(lblStatConn,        "🔗 已连接客户端",  12, Color.FromArgb(160, 170, 190));
-            SetupStatValue(lblStatConnVal,      "0",               12, Color.FromArgb(64, 148, 255));
-            lblStatConn.Name    = "lblStatConn";
+            // 
+            // lblStatConn
+            // 
+            lblStatConn.Location = new Point(0, 0);
+            lblStatConn.Name = "lblStatConn";
+            lblStatConn.Size = new Size(100, 23);
             lblStatConn.TabIndex = 0;
-            lblStatConnVal.Name  = "lblStatConnVal";
+            // 
+            // lblStatConnVal
+            // 
+            lblStatConnVal.Location = new Point(0, 0);
+            lblStatConnVal.Name = "lblStatConnVal";
+            lblStatConnVal.Size = new Size(100, 23);
             lblStatConnVal.TabIndex = 1;
-
-            SetupStatLabel(lblStatPending,      "⏳ 待处理任务",    52, Color.FromArgb(160, 170, 190));
-            SetupStatValue(lblStatPendingVal,   "0",               52, Color.FromArgb(255, 172, 64));
-            lblStatPending.Name    = "lblStatPending";
+            // 
+            // lblStatPending
+            // 
+            lblStatPending.Location = new Point(0, 0);
+            lblStatPending.Name = "lblStatPending";
+            lblStatPending.Size = new Size(100, 23);
             lblStatPending.TabIndex = 2;
-            lblStatPendingVal.Name  = "lblStatPendingVal";
+            // 
+            // lblStatPendingVal
+            // 
+            lblStatPendingVal.Location = new Point(0, 0);
+            lblStatPendingVal.Name = "lblStatPendingVal";
+            lblStatPendingVal.Size = new Size(100, 23);
             lblStatPendingVal.TabIndex = 3;
-
-            SetupStatLabel(lblStatCompleted,    "✅ 已完成任务",    92, Color.FromArgb(160, 170, 190));
-            SetupStatValue(lblStatCompletedVal, "0",               92, Color.FromArgb(82, 196, 110));
-            lblStatCompleted.Name    = "lblStatCompleted";
+            // 
+            // lblStatCompleted
+            // 
+            lblStatCompleted.Location = new Point(0, 0);
+            lblStatCompleted.Name = "lblStatCompleted";
+            lblStatCompleted.Size = new Size(100, 23);
             lblStatCompleted.TabIndex = 4;
-            lblStatCompletedVal.Name  = "lblStatCompletedVal";
+            // 
+            // lblStatCompletedVal
+            // 
+            lblStatCompletedVal.Location = new Point(0, 0);
+            lblStatCompletedVal.Name = "lblStatCompletedVal";
+            lblStatCompletedVal.Size = new Size(100, 23);
             lblStatCompletedVal.TabIndex = 5;
-
-            SetupStatLabel(lblStatFailed,       "❌ 失败任务",     132, Color.FromArgb(160, 170, 190));
-            SetupStatValue(lblStatFailedVal,    "0",              132, Color.FromArgb(255, 100, 100));
-            lblStatFailed.Name    = "lblStatFailed";
+            // 
+            // lblStatFailed
+            // 
+            lblStatFailed.Location = new Point(0, 0);
+            lblStatFailed.Name = "lblStatFailed";
+            lblStatFailed.Size = new Size(100, 23);
             lblStatFailed.TabIndex = 6;
-            lblStatFailedVal.Name  = "lblStatFailedVal";
+            // 
+            // lblStatFailedVal
+            // 
+            lblStatFailedVal.Location = new Point(0, 0);
+            lblStatFailedVal.Name = "lblStatFailedVal";
+            lblStatFailedVal.Size = new Size(100, 23);
             lblStatFailedVal.TabIndex = 7;
             // 
             // panelSettingsHeader
@@ -472,6 +502,7 @@ namespace EasyPrint
             panelJobActions.BackColor = Color.FromArgb(23, 27, 37);
             panelJobActions.Controls.Add(btnRetry);
             panelJobActions.Controls.Add(btnClearCompleted);
+            panelJobActions.Controls.Add(btnClearAll);
             panelJobActions.Dock = DockStyle.Bottom;
             panelJobActions.Location = new Point(1, 440);
             panelJobActions.Name = "panelJobActions";
@@ -506,9 +537,10 @@ namespace EasyPrint
             // 
             btnClearCompleted.AutoSize = false;
             btnClearCompleted.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnClearCompleted.BackColor = Color.FromArgb(0, 192, 192);
             btnClearCompleted.CharacterCasing = ReaLTaiizor.Controls.MaterialButton.CharacterCasingEnum.Normal;
             btnClearCompleted.Cursor = Cursors.Hand;
-            btnClearCompleted.Density = ReaLTaiizor.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnClearCompleted.Density = ReaLTaiizor.Controls.MaterialButton.MaterialButtonDensity.Dense;
             btnClearCompleted.Depth = 0;
             btnClearCompleted.HighEmphasis = false;
             btnClearCompleted.Icon = null;
@@ -521,10 +553,35 @@ namespace EasyPrint
             btnClearCompleted.Size = new Size(130, 32);
             btnClearCompleted.TabIndex = 1;
             btnClearCompleted.Text = "清除已完成";
-            btnClearCompleted.Type = ReaLTaiizor.Controls.MaterialButton.MaterialButtonType.Outlined;
+            btnClearCompleted.Type = ReaLTaiizor.Controls.MaterialButton.MaterialButtonType.Contained;
             btnClearCompleted.UseAccentColor = false;
-            btnClearCompleted.UseVisualStyleBackColor = true;
+            btnClearCompleted.UseVisualStyleBackColor = false;
             btnClearCompleted.Click += btnClearCompleted_Click;
+            // 
+            // btnClearAll
+            // 
+            btnClearAll.AutoSize = false;
+            btnClearAll.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            btnClearAll.BackColor = Color.FromArgb(192, 255, 192);
+            btnClearAll.CharacterCasing = ReaLTaiizor.Controls.MaterialButton.CharacterCasingEnum.Normal;
+            btnClearAll.Cursor = Cursors.Hand;
+            btnClearAll.Density = ReaLTaiizor.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnClearAll.Depth = 0;
+            btnClearAll.HighEmphasis = true;
+            btnClearAll.Icon = null;
+            btnClearAll.IconType = ReaLTaiizor.Controls.MaterialButton.MaterialIconType.Rebase;
+            btnClearAll.Location = new Point(266, 8);
+            btnClearAll.Margin = new Padding(4, 6, 4, 6);
+            btnClearAll.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
+            btnClearAll.Name = "btnClearAll";
+            btnClearAll.NoAccentTextColor = Color.FromArgb(200, 50, 50);
+            btnClearAll.Size = new Size(110, 32);
+            btnClearAll.TabIndex = 2;
+            btnClearAll.Text = "⚠ 清空任务";
+            btnClearAll.Type = ReaLTaiizor.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnClearAll.UseAccentColor = false;
+            btnClearAll.UseVisualStyleBackColor = false;
+            btnClearAll.Click += btnClearAll_Click;
             // 
             // panelHistoryHeader
             // 
@@ -556,6 +613,30 @@ namespace EasyPrint
             lblHistoryTitle.Text = "📋 打印任务";
             lblHistoryTitle.TextAlign = ContentAlignment.MiddleLeft;
             // 
+            // btnFilterAll
+            // 
+            btnFilterAll.Location = new Point(0, 0);
+            btnFilterAll.Name = "btnFilterAll";
+            btnFilterAll.Size = new Size(75, 23);
+            btnFilterAll.TabIndex = 1;
+            btnFilterAll.Click += btnFilterAll_Click;
+            // 
+            // btnFilterPending
+            // 
+            btnFilterPending.Location = new Point(0, 0);
+            btnFilterPending.Name = "btnFilterPending";
+            btnFilterPending.Size = new Size(75, 23);
+            btnFilterPending.TabIndex = 2;
+            btnFilterPending.Click += btnFilterPending_Click;
+            // 
+            // btnFilterFailed
+            // 
+            btnFilterFailed.Location = new Point(0, 0);
+            btnFilterFailed.Name = "btnFilterFailed";
+            btnFilterFailed.Size = new Size(75, 23);
+            btnFilterFailed.TabIndex = 3;
+            btnFilterFailed.Click += btnFilterFailed_Click;
+            // 
             // separator2
             // 
             separator2.BackColor = Color.FromArgb(23, 27, 37);
@@ -565,27 +646,6 @@ namespace EasyPrint
             separator2.Size = new Size(570, 5);
             separator2.TabIndex = 4;
             separator2.Text = "separator2";
-            // 
-            // btnFilterAll
-            // 
-            ConfigureFilterButton(btnFilterAll, "全部", 290, true);
-            btnFilterAll.Name = "btnFilterAll";
-            btnFilterAll.TabIndex = 1;
-            btnFilterAll.Click += btnFilterAll_Click;
-            // 
-            // btnFilterPending
-            // 
-            ConfigureFilterButton(btnFilterPending, "待处理", 366, false);
-            btnFilterPending.Name = "btnFilterPending";
-            btnFilterPending.TabIndex = 2;
-            btnFilterPending.Click += btnFilterPending_Click;
-            // 
-            // btnFilterFailed
-            // 
-            ConfigureFilterButton(btnFilterFailed, "失败", 450, false);
-            btnFilterFailed.Name = "btnFilterFailed";
-            btnFilterFailed.TabIndex = 3;
-            btnFilterFailed.Click += btnFilterFailed_Click;
             // 
             // panelBottom
             // 
@@ -840,6 +900,7 @@ namespace EasyPrint
         private Panel                                  panelJobActions;
         private ReaLTaiizor.Controls.MaterialButton    btnRetry;
         private ReaLTaiizor.Controls.MaterialButton    btnClearCompleted;
+        private ReaLTaiizor.Controls.MaterialButton    btnClearAll;
         private DataGridView                           dgvJobs;
         private ReaLTaiizor.Controls.Panel             panelBottom;
         private ReaLTaiizor.Controls.LostSeparator     lostSeparator2;

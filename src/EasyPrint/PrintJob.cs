@@ -7,13 +7,19 @@ namespace EasyPrint
     {
         // ── 基础字段 ─────────────────────────────────────────────────────────
 
-        public string   Id          { get; set; } = Guid.NewGuid().ToString("N")[..8].ToUpper();
-        public string   PrinterName { get; set; } = "";
-        public string   Context     { get; set; } = "";
-        public double   WidthMm     { get; set; } = 0;
-        public double   HeightMm    { get; set; } = 0;
-        public DateTime CreateTime  { get; set; } = DateTime.Now;
-        public string?  ErrorMessage { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString("N")[..8].ToUpper();
+        public string PrinterName { get; set; } = "";
+        public string Context { get; set; } = "";
+        public double WidthMm { get; set; } = 0;
+        public double HeightMm { get; set; } = 0;
+        public DateTime CreateTime { get; set; } = DateTime.Now;
+        public string? ErrorMessage { get; set; }
+
+        /// <summary>
+        /// 页面填充（或边距），单位：毫米，默认 0 0 0 0 表示上右下左
+        /// </summary>
+        public double[] PaddingMm { get; set; } = { 0, 0, 0, 0 };
+
 
         // ── 可变字段（触发 PropertyChanged 刷新绑定行）──────────────────────
 
@@ -45,11 +51,11 @@ namespace EasyPrint
         [Browsable(false)]
         public string StatusDisplay => Status switch
         {
-            PrintJobStatus.Pending   => "待处理",
-            PrintJobStatus.Printing  => "打印中",
+            PrintJobStatus.Pending => "待处理",
+            PrintJobStatus.Printing => "打印中",
             PrintJobStatus.Completed => "已完成",
-            PrintJobStatus.Failed    => "失败",
-            _                        => ""
+            PrintJobStatus.Failed => "失败",
+            _ => ""
         };
 
         // ── INotifyPropertyChanged ────────────────────────────────────────────
@@ -59,4 +65,6 @@ namespace EasyPrint
         private void OnPropertyChanged([CallerMemberName] string? name = null)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
+
+
 }
