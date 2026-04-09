@@ -28,6 +28,7 @@ namespace EasyPrint
 
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             parrotFormHandle1 = new ReaLTaiizor.Controls.ParrotFormHandle();
             panelTopActions = new ReaLTaiizor.Controls.Panel();
             lblAppTitle = new ReaLTaiizor.Controls.LabelEdit();
@@ -43,9 +44,16 @@ namespace EasyPrint
             txtIp = new TextBox();
             lblPort = new Label();
             txtPort = new TextBox();
+            lblStartup = new Label();
+            tglStartup = new FlatToggle();
             btnStart = new ReaLTaiizor.Controls.MaterialButton();
             btnStop = new ReaLTaiizor.Controls.MaterialButton();
             panelStats = new Panel();
+            notifyIcon1 = new NotifyIcon(components);
+            contextMenuTray = new ContextMenuStrip(components);
+            trayMenuShow = new ToolStripMenuItem();
+            trayMenuSeparator = new ToolStripSeparator();
+            trayMenuExit = new ToolStripMenuItem();
             lblStatConn = new Label();
             lblStatConnVal = new Label();
             lblStatPending = new Label();
@@ -78,6 +86,7 @@ namespace EasyPrint
             panelStatusRow = new Panel();
             lblStatus = new ReaLTaiizor.Controls.LabelEdit();
             lostSeparator2 = new ReaLTaiizor.Controls.LostSeparator();
+            contextMenuTray.SuspendLayout();
             panelTopActions.SuspendLayout();
             panelMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainerMain).BeginInit();
@@ -245,6 +254,8 @@ namespace EasyPrint
             panelSettingsContent.Controls.Add(txtIp);
             panelSettingsContent.Controls.Add(lblPort);
             panelSettingsContent.Controls.Add(txtPort);
+            panelSettingsContent.Controls.Add(lblStartup);
+            panelSettingsContent.Controls.Add(tglStartup);
             panelSettingsContent.Controls.Add(btnStart);
             panelSettingsContent.Controls.Add(btnStop);
             panelSettingsContent.Controls.Add(panelStats);
@@ -300,6 +311,26 @@ namespace EasyPrint
             txtPort.TabIndex = 1;
             txtPort.Text = "8765";
             // 
+            // lblStartup
+            // 
+            lblStartup.BackColor = Color.Transparent;
+            lblStartup.Font = new Font("Segoe UI", 9F);
+            lblStartup.ForeColor = Color.FromArgb(100, 112, 138);
+            lblStartup.Location = new Point(24, 157);
+            lblStartup.Name = "lblStartup";
+            lblStartup.Size = new Size(170, 22);
+            lblStartup.TabIndex = 5;
+            lblStartup.Text = "开机自动启动";
+            lblStartup.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // tglStartup
+            // 
+            tglStartup.Location = new Point(236, 154);
+            tglStartup.Name = "tglStartup";
+            tglStartup.Size = new Size(48, 26);
+            tglStartup.TabIndex = 6;
+            tglStartup.CheckedChanged += tglStartup_CheckedChanged;
+            // 
             // btnStart
             // 
             btnStart.AutoSize = false;
@@ -311,7 +342,7 @@ namespace EasyPrint
             btnStart.HighEmphasis = true;
             btnStart.Icon = null;
             btnStart.IconType = ReaLTaiizor.Controls.MaterialButton.MaterialIconType.Rebase;
-            btnStart.Location = new Point(24, 174);
+            btnStart.Location = new Point(24, 190);
             btnStart.Margin = new Padding(4, 6, 4, 6);
             btnStart.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
             btnStart.Name = "btnStart";
@@ -336,7 +367,7 @@ namespace EasyPrint
             btnStop.HighEmphasis = true;
             btnStop.Icon = null;
             btnStop.IconType = ReaLTaiizor.Controls.MaterialButton.MaterialIconType.Rebase;
-            btnStop.Location = new Point(164, 174);
+            btnStop.Location = new Point(164, 190);
             btnStop.Margin = new Padding(4, 6, 4, 6);
             btnStop.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
             btnStop.Name = "btnStop";
@@ -360,7 +391,7 @@ namespace EasyPrint
             panelStats.Controls.Add(lblStatCompletedVal);
             panelStats.Controls.Add(lblStatFailed);
             panelStats.Controls.Add(lblStatFailedVal);
-            panelStats.Location = new Point(24, 234);
+            panelStats.Location = new Point(24, 250);
             panelStats.Name = "panelStats";
             panelStats.Size = new Size(278, 168);
             panelStats.TabIndex = 4;
@@ -747,6 +778,44 @@ namespace EasyPrint
             lostSeparator2.TabIndex = 3;
             lostSeparator2.Text = "lostSeparator2";
             // 
+            // trayMenuShow（显示主窗口 - 加粗为默认项）
+            // 
+            trayMenuShow.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
+            trayMenuShow.Name = "trayMenuShow";
+            trayMenuShow.Padding = new Padding(8, 4, 8, 4);
+            trayMenuShow.Size = new Size(180, 26);
+            trayMenuShow.Text = "🖨  显示主窗口";
+            trayMenuShow.Click += trayMenuShow_Click;
+            // 
+            // trayMenuSeparator
+            // 
+            trayMenuSeparator.Name = "trayMenuSeparator";
+            trayMenuSeparator.Size = new Size(177, 6);
+            // 
+            // trayMenuExit（退出 - 渲染器会读取 ForeColor 显示为红色）
+            // 
+            trayMenuExit.ForeColor = Color.FromArgb(200, 80, 80);
+            trayMenuExit.Font = new Font("Segoe UI", 9F);
+            trayMenuExit.Name = "trayMenuExit";
+            trayMenuExit.Padding = new Padding(8, 4, 8, 4);
+            trayMenuExit.Size = new Size(180, 26);
+            trayMenuExit.Text = "✕  退出程序";
+            trayMenuExit.Click += trayMenuExit_Click;
+            // 
+            // contextMenuTray（渲染器在 Form1 构造函数中动态注入）
+            // 
+            contextMenuTray.Items.AddRange(new ToolStripItem[] { trayMenuShow, trayMenuSeparator, trayMenuExit });
+            contextMenuTray.Name = "contextMenuTray";
+            contextMenuTray.Size = new Size(181, 62);
+            // 
+            // notifyIcon1（图标在 Form1 构造函数中从 printer.ico 加载）
+            // 
+            notifyIcon1.ContextMenuStrip = contextMenuTray;
+            notifyIcon1.Icon = SystemIcons.Application;
+            notifyIcon1.Text = "EasyPrint 打印服务";
+            notifyIcon1.Visible = true;
+            notifyIcon1.DoubleClick += notifyIcon1_DoubleClick;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(96F, 96F);
@@ -766,6 +835,7 @@ namespace EasyPrint
             StartPosition = FormStartPosition.CenterScreen;
             Text = "EasyPrint 打印服务";
             FormClosing += Form1_FormClosing;
+            contextMenuTray.ResumeLayout(false);
             panelTopActions.ResumeLayout(false);
             panelMain.ResumeLayout(false);
             splitContainerMain.Panel1.ResumeLayout(false);
@@ -857,9 +927,16 @@ namespace EasyPrint
         private TextBox                                txtIp;
         private Label                                  lblPort;
         private TextBox                                txtPort;
+        private Label                                  lblStartup;
+        private FlatToggle                             tglStartup;
         private ReaLTaiizor.Controls.MaterialButton    btnStart;
         private ReaLTaiizor.Controls.MaterialButton    btnStop;
         private Panel                                  panelStats;
+        private NotifyIcon                             notifyIcon1;
+        private ContextMenuStrip                       contextMenuTray;
+        private ToolStripMenuItem                      trayMenuShow;
+        private ToolStripSeparator                     trayMenuSeparator;
+        private ToolStripMenuItem                      trayMenuExit;
         private Label                                  lblStatConn;
         private Label                                  lblStatConnVal;
         private Label                                  lblStatPending;

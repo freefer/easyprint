@@ -36,6 +36,13 @@ namespace EasyPrint
         // 浏览器引擎下载任务（后台进行，需要时全局等待）
         private Task? _browserReadyTask;
 
+        // 托盘：true = 用户从托盘菜单点击退出，允许真正关闭
+        private bool _forceClose = false;
+
+        // 开机自启注册表路径
+        private const string StartupRegKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
+        private const string AppName       = "EasyPrint";
+
 
 
         // ── 构造 & 初始化 ─────────────────────────────────────────────────────
@@ -45,6 +52,19 @@ namespace EasyPrint
 
 
             InitializeComponent();
+
+            // ── 加载自定义图标 ─────────────────────────────────────────────────
+            var icoPath = Path.Combine(AppContext.BaseDirectory, "printer.ico");
+            if (File.Exists(icoPath))
+            {
+                var icon = new Icon(icoPath);
+                Icon = icon;               // 任务栏程序图标
+                notifyIcon1.Icon = icon;   // 系统托盘图标
+            }
+
+            // ── 注入暗色扁平渲染器 ─────────────────────────────────────────────
+            contextMenuTray.Renderer = new DarkMenuRenderer();
+
             this._loggerProvider = loggerProvider;
             this._loggerProvider.LogEmitted += AppendLog;
             _settings = settings;
@@ -278,8 +298,11 @@ namespace EasyPrint
 
         private void ApplySettingsToUI()
         {
-            txtIp.Text = _settings.Ip;
-            txtPort.Text = _settings.Port.ToString();
+            txtIp.Text         = _settings.Ip;
+            txtPort.Text       = _settings.Port.ToString();
+            tglStartup.Checked = _settings.StartWithWindows;
+            // 启动时同步注册表与设置文件保持一致
+            SetStartup(_settings.StartWithWindows);
         }
 
         private bool ReadSettingsFromUI()
@@ -643,7 +666,88 @@ namespace EasyPrint
 
         private void Form1_FormClosing(object? sender, FormClosingEventArgs e)
         {
-            // TODO: 确保在此处停止 WebSocket 服务
+            if (!_forceClose && e.CloseReason == CloseReason.UserClosing)
+            {
+                e.Cancel = true;
+                Hide();
+                notifyIcon1.ShowBalloonTip(
+                    2000,
+                    "EasyPrint 打印服务",
+                    "程序已最小化到托盘，双击图标可重新打开。",
+                    ToolTipIcon.Info);
+                return;
+            }
+
+            notifyIcon1.Visible = false;
+        }
+
+        // ── 托盘图标事件 ──────────────────────────────────────────────────────
+
+        /// <summary>双击托盘图标 → 显示/还原主窗口。</summary>
+        private void notifyIcon1_DoubleClick(object? sender, EventArgs e)
+        {
+            ShowMainWindow();
+        }
+
+        /// <summary>托盘菜单"显示主窗口"。</summary>
+        private void trayMenuShow_Click(object? sender, EventArgs e)
+        {
+            ShowMainWindow();
+        }
+
+        /// <summary>托盘菜单"退出程序"。</summary>
+        private async void trayMenuExit_Click(object? sender, EventArgs e)
+        {
+            _forceClose = true;
+            if (_server != null)
+                await _server.StopAsync(CancellationToken.None);
+            Application.Exit();
+        }
+
+        private void ShowMainWindow()
+        {
+            Show();
+            WindowState = FormWindowState.Normal;
+            Activate();
+        }
+
+        // ── 开机自启（Windows 注册表）─────────────────────────────────────────
+
+        private bool IsStartupEnabled()
+        {
+            try
+            {
+                using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(StartupRegKey, false);
+                return key?.GetValue(AppName) is string path
+                    && path.Equals(Application.ExecutablePath, StringComparison.OrdinalIgnoreCase);
+            }
+            catch { return false; }
+        }
+
+        private void SetStartup(bool enable)
+        {
+            try
+            {
+                using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(StartupRegKey, true);
+                if (key == null) return;
+                if (enable)
+                    key.SetValue(AppName, Application.ExecutablePath);
+                else
+                    key.DeleteValue(AppName, throwOnMissingValue: false);
+            }
+            catch (Exception ex)
+            {
+                AppendLog($"开机自启设置失败：{ex.Message}", LogLevel.Warning);
+            }
+        }
+
+        private void tglStartup_CheckedChanged(object? sender, EventArgs e)
+        {
+            _settings.StartWithWindows = tglStartup.Checked;
+            SaveSettings();
+            SetStartup(tglStartup.Checked);
+            AppendLog(tglStartup.Checked ? "已添加开机自动启动" : "已取消开机自动启动",
+                      LogLevel.Information);
         }
 
         // ── 演示数据（可删除）────────────────────────────────────────────────
