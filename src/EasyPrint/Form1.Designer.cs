@@ -365,60 +365,40 @@ namespace EasyPrint
             panelStats.Size = new Size(278, 168);
             panelStats.TabIndex = 4;
             // 
-            // lblStatConn
+            // lblStatConn / lblStatConnVal
             // 
-            lblStatConn.Location = new Point(0, 0);
-            lblStatConn.Name = "lblStatConn";
-            lblStatConn.Size = new Size(100, 23);
+            SetupStatLabel(lblStatConn,        "已连接客户端", 12,  Color.FromArgb(100, 112, 138));
+            lblStatConn.Name     = "lblStatConn";
             lblStatConn.TabIndex = 0;
-            // 
-            // lblStatConnVal
-            // 
-            lblStatConnVal.Location = new Point(0, 0);
-            lblStatConnVal.Name = "lblStatConnVal";
-            lblStatConnVal.Size = new Size(100, 23);
+            SetupStatValue(lblStatConnVal,     "0",           12,  Color.FromArgb(212, 218, 232));
+            lblStatConnVal.Name     = "lblStatConnVal";
             lblStatConnVal.TabIndex = 1;
             // 
-            // lblStatPending
+            // lblStatPending / lblStatPendingVal
             // 
-            lblStatPending.Location = new Point(0, 0);
-            lblStatPending.Name = "lblStatPending";
-            lblStatPending.Size = new Size(100, 23);
+            SetupStatLabel(lblStatPending,     "等待中",       52,  Color.FromArgb(255, 152,   0));
+            lblStatPending.Name     = "lblStatPending";
             lblStatPending.TabIndex = 2;
-            // 
-            // lblStatPendingVal
-            // 
-            lblStatPendingVal.Location = new Point(0, 0);
-            lblStatPendingVal.Name = "lblStatPendingVal";
-            lblStatPendingVal.Size = new Size(100, 23);
+            SetupStatValue(lblStatPendingVal,  "0",           52,  Color.FromArgb(255, 152,   0));
+            lblStatPendingVal.Name     = "lblStatPendingVal";
             lblStatPendingVal.TabIndex = 3;
             // 
-            // lblStatCompleted
+            // lblStatCompleted / lblStatCompletedVal
             // 
-            lblStatCompleted.Location = new Point(0, 0);
-            lblStatCompleted.Name = "lblStatCompleted";
-            lblStatCompleted.Size = new Size(100, 23);
+            SetupStatLabel(lblStatCompleted,   "已完成",       92,  Color.FromArgb( 82, 196, 110));
+            lblStatCompleted.Name     = "lblStatCompleted";
             lblStatCompleted.TabIndex = 4;
-            // 
-            // lblStatCompletedVal
-            // 
-            lblStatCompletedVal.Location = new Point(0, 0);
-            lblStatCompletedVal.Name = "lblStatCompletedVal";
-            lblStatCompletedVal.Size = new Size(100, 23);
+            SetupStatValue(lblStatCompletedVal,"0",           92,  Color.FromArgb( 82, 196, 110));
+            lblStatCompletedVal.Name     = "lblStatCompletedVal";
             lblStatCompletedVal.TabIndex = 5;
             // 
-            // lblStatFailed
+            // lblStatFailed / lblStatFailedVal
             // 
-            lblStatFailed.Location = new Point(0, 0);
-            lblStatFailed.Name = "lblStatFailed";
-            lblStatFailed.Size = new Size(100, 23);
+            SetupStatLabel(lblStatFailed,      "失败",         132, Color.FromArgb(255,  90,  90));
+            lblStatFailed.Name     = "lblStatFailed";
             lblStatFailed.TabIndex = 6;
-            // 
-            // lblStatFailedVal
-            // 
-            lblStatFailedVal.Location = new Point(0, 0);
-            lblStatFailedVal.Name = "lblStatFailedVal";
-            lblStatFailedVal.Size = new Size(100, 23);
+            SetupStatValue(lblStatFailedVal,   "0",           132, Color.FromArgb(255,  90,  90));
+            lblStatFailedVal.Name     = "lblStatFailedVal";
             lblStatFailedVal.TabIndex = 7;
             // 
             // panelSettingsHeader
@@ -615,27 +595,24 @@ namespace EasyPrint
             // 
             // btnFilterAll
             // 
-            btnFilterAll.Location = new Point(0, 0);
-            btnFilterAll.Name = "btnFilterAll";
-            btnFilterAll.Size = new Size(75, 23);
+            ConfigureFilterButton(btnFilterAll, "全部", 240, active: true);
+            btnFilterAll.Name     = "btnFilterAll";
             btnFilterAll.TabIndex = 1;
-            btnFilterAll.Click += btnFilterAll_Click;
+            btnFilterAll.Click   += btnFilterAll_Click;
             // 
             // btnFilterPending
             // 
-            btnFilterPending.Location = new Point(0, 0);
-            btnFilterPending.Name = "btnFilterPending";
-            btnFilterPending.Size = new Size(75, 23);
+            ConfigureFilterButton(btnFilterPending, "待处理", 320, active: false);
+            btnFilterPending.Name     = "btnFilterPending";
             btnFilterPending.TabIndex = 2;
-            btnFilterPending.Click += btnFilterPending_Click;
+            btnFilterPending.Click   += btnFilterPending_Click;
             // 
             // btnFilterFailed
             // 
-            btnFilterFailed.Location = new Point(0, 0);
-            btnFilterFailed.Name = "btnFilterFailed";
-            btnFilterFailed.Size = new Size(75, 23);
+            ConfigureFilterButton(btnFilterFailed, "失败", 400, active: false);
+            btnFilterFailed.Name     = "btnFilterFailed";
             btnFilterFailed.TabIndex = 3;
-            btnFilterFailed.Click += btnFilterFailed_Click;
+            btnFilterFailed.Click   += btnFilterFailed_Click;
             // 
             // separator2
             // 
