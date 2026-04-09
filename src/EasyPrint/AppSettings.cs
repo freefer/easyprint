@@ -5,7 +5,7 @@ namespace EasyPrint
     {
 
         public string Ip{ get; set; } = "Any";
-        public int    Port       { get; set; } = 201212;
+        public int    Port       { get; set; } = 8765;
         public bool   AutoStart  { get; set; } = true;
 
         public long MaxPackageLength { get; set; } = 1022886006;
