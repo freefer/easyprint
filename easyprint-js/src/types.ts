@@ -64,6 +64,63 @@ export interface PrintResponse {
   data?: any;
 }
 
+// ── JOBS 命令 / 打印队列条目（对应 C# PrintQueueJob）────────────────────────
+
+/**
+ * Windows 打印队列中的单个任务信息，对应服务端 `PrintQueueJob.cs`。
+ *
+ * 通过 `client.jobs()` 获取，响应示例：
+ * ```ts
+ * client.on('response', resp => {
+ *   if (resp.command === 'JOBS' && resp.status === 200) {
+ *     const jobs = resp.data as PrintQueueJob[];
+ *     console.log(jobs);
+ *   }
+ * });
+ * ```
+ */
+export interface PrintQueueJob {
+  /** Windows 系统分配的任务 ID */
+  jobId: number;
+  /** 打印机名称 */
+  printerName: string;
+  /** 文档名称 */
+  document: string;
+  /** 提交任务的用户名 */
+  userName: string;
+  /** 驱动返回的原始状态文本（可为空） */
+  statusText: string;
+  /**
+   * 状态位标志（JOB_STATUS_* bitmask）。
+   * 常用位：0x10=打印中 / 0x08=后台处理 / 0x02=错误 / 0x80=已打印 / 0x1000=已完成
+   */
+  status: number;
+  /** 人类可读的状态描述，如 "打印中" / "已完成" / "失败" */
+  statusLabel: string;
+  /** 文档总页数，0 表示未知 */
+  totalPages: number;
+  /** 已打印页数 */
+  pagesPrinted: number;
+  /** 打印优先级（1–99） */
+  priority: number;
+  /** 在队列中的位置（从 1 开始） */
+  position: number;
+}
+
+// ── 批量任务控制命令响应（CANCEL / RESTART / PAUSE / RESUME）─────────────────
+
+/**
+ * 批量任务控制命令（CANCEL / RESTART / PAUSE / RESUME）响应的单个结果条目。
+ *
+ * 每个 `jobId` 对应一个 `ok` 表示该任务操作是否成功。
+ */
+export interface JobControlResult {
+  /** 被操作的任务 ID */
+  jobId: number;
+  /** 该任务操作是否成功 */
+  ok: boolean;
+}
+
 // ── LIST 命令相关类型 ─────────────────────────────────────────────────────────
 
 /**

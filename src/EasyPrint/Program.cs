@@ -48,6 +48,11 @@ namespace EasyPrint
             {
                 commandOptions.AddCommand<LIST>();
                 commandOptions.AddCommand<PRINT>();
+                commandOptions.AddCommand<JOBS>();
+                commandOptions.AddCommand<CANCEL>();
+                commandOptions.AddCommand<RESTART>();
+                commandOptions.AddCommand<PAUSE>();
+                commandOptions.AddCommand<RESUME>();
             })
             .UseInProcSessionContainer()
             .ConfigureLogging((hostCtx, loggingBuilder) =>

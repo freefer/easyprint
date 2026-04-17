@@ -2,8 +2,10 @@ import type {
   ConnectionState,
   EasyPrintEventMap,
   EasyPrintOptions,
+  JobControlResult,
   PrinterInfo,
   PrintJobRequest,
+  PrintQueueJob,
   PrintResponse,
 } from './types';
 
@@ -201,6 +203,97 @@ export class EasyPrintClient extends TypedEmitter<EasyPrintEventMap> {
   list(): void {
     // C# LIST 命令无需 JSON 体，直接发送命令字符串
     this.send('LIST');
+  }
+
+  // ── JOBS ─────────────────────────────────────────────────────────────────
+
+  /**
+   * 查询指定打印机的打印队列任务列表。
+   *
+   * 服务端返回 `command = "JOBS"` 的响应，`data` 字段为 `PrintQueueJob[]`。
+   *
+   * @param printerName 打印机名称，省略时使用服务端默认打印机
+   *
+   * @example
+   * ```ts
+   * client.on('response', resp => {
+   *   if (resp.command === 'JOBS' && resp.status === 200) {
+   *     const jobs = resp.data as PrintQueueJob[];
+   *     console.log(jobs);
+   *   }
+   * });
+   * client.jobs();                      // 默认打印机
+   * client.jobs('TSC TE200');           // 指定打印机
+   * ```
+   */
+  jobs(printerName?: string): void {
+    const body = printerName ? JSON.stringify({ printerName }) : '';
+    this.send(body ? `JOBS ${body}` : 'JOBS');
+  }
+
+  // ── 任务控制（CANCEL / RESTART / PAUSE / RESUME）─────────────────────────
+
+  /**
+   * 取消（删除）打印队列中的一个或多个任务。
+   *
+   * 服务端返回 `command = "CANCEL"` 的响应，`data` 字段为 `JobControlResult[]`。
+   *
+   * @param jobIds     要取消的任务 ID 列表（支持单个或多个）
+   * @param printerName 打印机名称，省略时使用服务端默认打印机
+   *
+   * @example
+   * ```ts
+   * client.cancel([5, 6, 7], 'TSC TE200');
+   * ```
+   */
+  cancel(jobIds: number[], printerName?: string): void {
+    this.sendJobControl('CANCEL', jobIds, printerName);
+  }
+
+  /**
+   * 重启打印队列中的一个或多个任务（从头重新打印）。
+   *
+   * 服务端返回 `command = "RESTART"` 的响应，`data` 字段为 `JobControlResult[]`。
+   *
+   * @param jobIds     要重启的任务 ID 列表
+   * @param printerName 打印机名称，省略时使用服务端默认打印机
+   */
+  restart(jobIds: number[], printerName?: string): void {
+    this.sendJobControl('RESTART', jobIds, printerName);
+  }
+
+  /**
+   * 暂停打印队列中的一个或多个任务。
+   *
+   * 服务端返回 `command = "PAUSE"` 的响应，`data` 字段为 `JobControlResult[]`。
+   *
+   * @param jobIds     要暂停的任务 ID 列表
+   * @param printerName 打印机名称，省略时使用服务端默认打印机
+   */
+  pause(jobIds: number[], printerName?: string): void {
+    this.sendJobControl('PAUSE', jobIds, printerName);
+  }
+
+  /**
+   * 继续（恢复）打印队列中已暂停的一个或多个任务。
+   *
+   * 服务端返回 `command = "RESUME"` 的响应，`data` 字段为 `JobControlResult[]`。
+   *
+   * @param jobIds     要继续的任务 ID 列表
+   * @param printerName 打印机名称，省略时使用服务端默认打印机
+   */
+  resume(jobIds: number[], printerName?: string): void {
+    this.sendJobControl('RESUME', jobIds, printerName);
+  }
+
+  /** 批量任务控制命令的统一内部实现 */
+  private sendJobControl(
+    command: 'CANCEL' | 'RESTART' | 'PAUSE' | 'RESUME',
+    jobIds: number[],
+    printerName?: string,
+  ): void {
+    const body = JSON.stringify({ printerName: printerName ?? '', jobIds });
+    this.send(`${command} ${body}`);
   }
 
   // ── 底层发送 ─────────────────────────────────────────────────────────────

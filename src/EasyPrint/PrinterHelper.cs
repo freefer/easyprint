@@ -25,7 +25,44 @@ namespace EasyPrint
         [DllImport("winspool.drv", SetLastError = true)]
         private static extern bool ClosePrinter(IntPtr hPrinter);
 
-        private const int DM_OUT_BUFFER = 2;
+        [DllImport("winspool.drv", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern bool EnumJobs(
+            IntPtr hPrinter, uint FirstJob, uint NoJobs, uint Level,
+            IntPtr pJob, uint cbBuf, out uint pcbNeeded, out uint pcReturned);
+
+        [DllImport("winspool.drv", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern bool SetJob(
+            IntPtr hPrinter, uint JobId, uint Level, IntPtr pJob, uint Command);
+
+        private const int  DM_OUT_BUFFER = 2;
+
+        // SetJob 控制命令
+        private const uint JOB_CONTROL_PAUSE   = 1;
+        private const uint JOB_CONTROL_RESUME  = 2;
+        private const uint JOB_CONTROL_CANCEL  = 3;
+        private const uint JOB_CONTROL_RESTART = 4;
+        private const uint JOB_CONTROL_DELETE  = 5;
+
+        // JOB_INFO_1（Unicode）：所有字符串字段均为指向同一缓冲区内部的指针
+        [StructLayout(LayoutKind.Sequential)]
+        private struct JOB_INFO_1
+        {
+            public uint   JobId;
+            public IntPtr pPrinterName;
+            public IntPtr pMachineName;
+            public IntPtr pUserName;
+            public IntPtr pDocument;
+            public IntPtr pDatatype;
+            public IntPtr pStatus;   // 驱动自定义状态文本，可为空
+            public uint   Status;    // JOB_STATUS_* 位标志
+            public uint   Priority;
+            public uint   Position;
+            public uint   TotalPages;
+            public uint   PagesPrinted;
+            // SYSTEMTIME Submitted（16 字节）
+            public ulong  _st1;
+            public ulong  _st2;
+        }
 
         // ── DEVMODEW 关键字段（Unicode，仅声明需要的偏移）────────────────
         // WCHAR dmDeviceName[32]  offset  0  (64 bytes)
@@ -152,6 +189,107 @@ namespace EasyPrint
             }
 
 
+        }
+
+        // ── 打印队列 ──────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// 获取指定打印机的打印队列任务列表。
+        /// <paramref name="printerName"/> 为 null 时使用系统默认打印机。
+        /// </summary>
+        public static List<PrintQueueJob> GetPrintJobs(string? printerName = null)
+        {
+            var jobs = new List<PrintQueueJob>();
+
+            printerName ??= GetDefaultPrinterName();
+            if (printerName == null) return jobs;
+
+            if (!OpenPrinter(printerName, out IntPtr hPrinter, IntPtr.Zero))
+                return jobs;
+
+            try
+            {
+                // 第一次调用：查询所需缓冲区大小
+                EnumJobs(hPrinter, 0, 256, 1, IntPtr.Zero, 0, out uint needed, out _);
+                if (needed == 0) return jobs;
+
+                IntPtr pBuf = Marshal.AllocHGlobal((int)needed);
+                try
+                {
+                    if (!EnumJobs(hPrinter, 0, 256, 1, pBuf, needed, out _, out uint count))
+                        return jobs;
+
+                    int stride = Marshal.SizeOf<JOB_INFO_1>();
+                    for (uint i = 0; i < count; i++)
+                    {
+                        var info = Marshal.PtrToStructure<JOB_INFO_1>(pBuf + (int)(i * stride));
+                        jobs.Add(new PrintQueueJob
+                        {
+                            JobId        = (int)info.JobId,
+                            Document     = info.pDocument   != IntPtr.Zero ? Marshal.PtrToStringUni(info.pDocument)   ?? "" : "",
+                            UserName     = info.pUserName   != IntPtr.Zero ? Marshal.PtrToStringUni(info.pUserName)   ?? "" : "",
+                            StatusText   = info.pStatus     != IntPtr.Zero ? Marshal.PtrToStringUni(info.pStatus)     ?? "" : "",
+                            Status       = (int)info.Status,
+                            StatusLabel  = ParseJobStatus(info.Status),
+                            TotalPages   = (int)info.TotalPages,
+                            PagesPrinted = (int)info.PagesPrinted,
+                            Priority     = (int)info.Priority,
+                            Position     = (int)info.Position,
+                            PrinterName  = printerName,
+                        });
+                    }
+                }
+                finally { Marshal.FreeHGlobal(pBuf); }
+            }
+            finally { ClosePrinter(hPrinter); }
+
+            return jobs;
+        }
+
+        /// <summary>取消（删除）指定打印任务。成功返回 true。</summary>
+        public static bool CancelPrintJob(string printerName, int jobId)
+            => ControlJob(printerName, (uint)jobId, JOB_CONTROL_DELETE);
+
+        /// <summary>重启指定打印任务。成功返回 true。</summary>
+        public static bool RestartPrintJob(string printerName, int jobId)
+            => ControlJob(printerName, (uint)jobId, JOB_CONTROL_RESTART);
+
+        /// <summary>暂停指定打印任务。成功返回 true。</summary>
+        public static bool PausePrintJob(string printerName, int jobId)
+            => ControlJob(printerName, (uint)jobId, JOB_CONTROL_PAUSE);
+
+        /// <summary>继续（恢复）指定打印任务。成功返回 true。</summary>
+        public static bool ResumePrintJob(string printerName, int jobId)
+            => ControlJob(printerName, (uint)jobId, JOB_CONTROL_RESUME);
+
+        private static bool ControlJob(string printerName, uint jobId, uint command)
+        {
+            if (!OpenPrinter(printerName, out IntPtr hPrinter, IntPtr.Zero))
+                return false;
+            try
+            {
+                return SetJob(hPrinter, jobId, 0, IntPtr.Zero, command);
+            }
+            finally { ClosePrinter(hPrinter); }
+        }
+
+        private static string ParseJobStatus(uint status)
+        {
+            if (status == 0) return "排队中";
+            var parts = new List<string>();
+            if ((status & 0x0010) != 0) parts.Add("打印中");
+            if ((status & 0x0008) != 0) parts.Add("后台处理");
+            if ((status & 0x0001) != 0) parts.Add("已暂停");
+            if ((status & 0x0002) != 0) parts.Add("错误");
+            if ((status & 0x0020) != 0) parts.Add("打印机离线");
+            if ((status & 0x0040) != 0) parts.Add("缺纸");
+            if ((status & 0x0080) != 0) parts.Add("已打印");
+            if ((status & 0x0004) != 0) parts.Add("删除中");
+            if ((status & 0x0100) != 0) parts.Add("已删除");
+            if ((status & 0x1000) != 0) parts.Add("已完成");
+            if ((status & 0x0200) != 0) parts.Add("设备队列阻塞");
+            if ((status & 0x0400) != 0) parts.Add("需要人工干预");
+            return parts.Count > 0 ? string.Join(", ", parts) : $"未知(0x{status:X})";
         }
 
         /// <summary>获取默认打印机名称，失败返回 null。</summary>

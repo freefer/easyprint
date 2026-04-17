@@ -68,9 +68,10 @@ namespace EasyPrint
             panelRight = new ReaLTaiizor.Controls.Panel();
             dgvJobs = new DataGridView();
             panelJobActions = new Panel();
-            btnRetry = new ReaLTaiizor.Controls.MaterialButton();
-            btnClearCompleted = new ReaLTaiizor.Controls.MaterialButton();
-            btnClearAll = new ReaLTaiizor.Controls.MaterialButton();
+            btnPauseAll  = new ReaLTaiizor.Controls.MaterialButton();
+            btnResumeAll = new ReaLTaiizor.Controls.MaterialButton();
+            btnCancelAll = new ReaLTaiizor.Controls.MaterialButton();
+            btnClearAll  = new ReaLTaiizor.Controls.MaterialButton();
             panelHistoryHeader = new ReaLTaiizor.Controls.Panel();
             lblHistoryTitle = new ReaLTaiizor.Controls.LabelEdit();
             btnFilterAll = new Button();
@@ -511,8 +512,9 @@ namespace EasyPrint
             // panelJobActions
             // 
             panelJobActions.BackColor = Color.FromArgb(23, 27, 37);
-            panelJobActions.Controls.Add(btnRetry);
-            panelJobActions.Controls.Add(btnClearCompleted);
+            panelJobActions.Controls.Add(btnPauseAll);
+            panelJobActions.Controls.Add(btnResumeAll);
+            panelJobActions.Controls.Add(btnCancelAll);
             panelJobActions.Controls.Add(btnClearAll);
             panelJobActions.Dock = DockStyle.Bottom;
             panelJobActions.Location = new Point(1, 440);
@@ -520,54 +522,74 @@ namespace EasyPrint
             panelJobActions.Size = new Size(580, 49);
             panelJobActions.TabIndex = 2;
             // 
-            // btnRetry
+            // btnPauseAll
             // 
-            btnRetry.AutoSize = false;
-            btnRetry.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnRetry.CharacterCasing = ReaLTaiizor.Controls.MaterialButton.CharacterCasingEnum.Normal;
-            btnRetry.Cursor = Cursors.Hand;
-            btnRetry.Density = ReaLTaiizor.Controls.MaterialButton.MaterialButtonDensity.Default;
-            btnRetry.Depth = 0;
-            btnRetry.HighEmphasis = true;
-            btnRetry.Icon = null;
-            btnRetry.IconType = ReaLTaiizor.Controls.MaterialButton.MaterialIconType.Rebase;
-            btnRetry.Location = new Point(16, 8);
-            btnRetry.Margin = new Padding(4, 6, 4, 6);
-            btnRetry.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
-            btnRetry.Name = "btnRetry";
-            btnRetry.NoAccentTextColor = Color.Empty;
-            btnRetry.Size = new Size(100, 32);
-            btnRetry.TabIndex = 0;
-            btnRetry.Text = "↩ 重试";
-            btnRetry.Type = ReaLTaiizor.Controls.MaterialButton.MaterialButtonType.Contained;
-            btnRetry.UseAccentColor = true;
-            btnRetry.UseVisualStyleBackColor = true;
-            btnRetry.Click += btnRetry_Click;
+            btnPauseAll.AutoSize = false;
+            btnPauseAll.CharacterCasing = ReaLTaiizor.Controls.MaterialButton.CharacterCasingEnum.Normal;
+            btnPauseAll.Cursor = Cursors.Hand;
+            btnPauseAll.Density = ReaLTaiizor.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnPauseAll.Depth = 0;
+            btnPauseAll.HighEmphasis = true;
+            btnPauseAll.Icon = null;
+            btnPauseAll.IconType = ReaLTaiizor.Controls.MaterialButton.MaterialIconType.Rebase;
+            btnPauseAll.Location = new Point(16, 8);
+            btnPauseAll.Margin = new Padding(4, 6, 4, 6);
+            btnPauseAll.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
+            btnPauseAll.Name = "btnPauseAll";
+            btnPauseAll.NoAccentTextColor = Color.Empty;
+            btnPauseAll.Size = new Size(100, 32);
+            btnPauseAll.TabIndex = 0;
+            btnPauseAll.Text = "⏸ 全部暂停";
+            btnPauseAll.Type = ReaLTaiizor.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnPauseAll.UseAccentColor = false;
+            btnPauseAll.UseVisualStyleBackColor = true;
+            btnPauseAll.Click += btnPauseAll_Click;
             // 
-            // btnClearCompleted
+            // btnResumeAll
             // 
-            btnClearCompleted.AutoSize = false;
-            btnClearCompleted.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            btnClearCompleted.BackColor = Color.FromArgb(0, 192, 192);
-            btnClearCompleted.CharacterCasing = ReaLTaiizor.Controls.MaterialButton.CharacterCasingEnum.Normal;
-            btnClearCompleted.Cursor = Cursors.Hand;
-            btnClearCompleted.Density = ReaLTaiizor.Controls.MaterialButton.MaterialButtonDensity.Dense;
-            btnClearCompleted.Depth = 0;
-            btnClearCompleted.HighEmphasis = false;
-            btnClearCompleted.Icon = null;
-            btnClearCompleted.IconType = ReaLTaiizor.Controls.MaterialButton.MaterialIconType.Rebase;
-            btnClearCompleted.Location = new Point(126, 8);
-            btnClearCompleted.Margin = new Padding(4, 6, 4, 6);
-            btnClearCompleted.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
-            btnClearCompleted.Name = "btnClearCompleted";
-            btnClearCompleted.NoAccentTextColor = Color.Empty;
-            btnClearCompleted.Size = new Size(130, 32);
-            btnClearCompleted.TabIndex = 1;
-            btnClearCompleted.Text = "清除已完成";
-            btnClearCompleted.Type = ReaLTaiizor.Controls.MaterialButton.MaterialButtonType.Contained;
-            btnClearCompleted.UseAccentColor = false;
-            btnClearCompleted.UseVisualStyleBackColor = false;
-            btnClearCompleted.Click += btnClearCompleted_Click;
+            btnResumeAll.AutoSize = false;
+            btnResumeAll.CharacterCasing = ReaLTaiizor.Controls.MaterialButton.CharacterCasingEnum.Normal;
+            btnResumeAll.Cursor = Cursors.Hand;
+            btnResumeAll.Density = ReaLTaiizor.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnResumeAll.Depth = 0;
+            btnResumeAll.HighEmphasis = true;
+            btnResumeAll.Icon = null;
+            btnResumeAll.IconType = ReaLTaiizor.Controls.MaterialButton.MaterialIconType.Rebase;
+            btnResumeAll.Location = new Point(124, 8);
+            btnResumeAll.Margin = new Padding(4, 6, 4, 6);
+            btnResumeAll.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
+            btnResumeAll.Name = "btnResumeAll";
+            btnResumeAll.NoAccentTextColor = Color.Empty;
+            btnResumeAll.Size = new Size(100, 32);
+            btnResumeAll.TabIndex = 1;
+            btnResumeAll.Text = "▶ 全部继续";
+            btnResumeAll.Type = ReaLTaiizor.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnResumeAll.UseAccentColor = true;
+            btnResumeAll.UseVisualStyleBackColor = true;
+            btnResumeAll.Click += btnResumeAll_Click;
+            // 
+            // btnCancelAll
+            // 
+            btnCancelAll.AutoSize = false;
+            btnCancelAll.CharacterCasing = ReaLTaiizor.Controls.MaterialButton.CharacterCasingEnum.Normal;
+            btnCancelAll.Cursor = Cursors.Hand;
+            btnCancelAll.Density = ReaLTaiizor.Controls.MaterialButton.MaterialButtonDensity.Default;
+            btnCancelAll.Depth = 0;
+            btnCancelAll.HighEmphasis = true;
+            btnCancelAll.Icon = null;
+            btnCancelAll.IconType = ReaLTaiizor.Controls.MaterialButton.MaterialIconType.Rebase;
+            btnCancelAll.Location = new Point(232, 8);
+            btnCancelAll.Margin = new Padding(4, 6, 4, 6);
+            btnCancelAll.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
+            btnCancelAll.Name = "btnCancelAll";
+            btnCancelAll.NoAccentTextColor = Color.FromArgb(200, 50, 50);
+            btnCancelAll.Size = new Size(100, 32);
+            btnCancelAll.TabIndex = 2;
+            btnCancelAll.Text = "✕ 全部取消";
+            btnCancelAll.Type = ReaLTaiizor.Controls.MaterialButton.MaterialButtonType.Contained;
+            btnCancelAll.UseAccentColor = false;
+            btnCancelAll.UseVisualStyleBackColor = false;
+            btnCancelAll.Click += btnCancelAll_Click;
             // 
             // btnClearAll
             // 
@@ -581,7 +603,7 @@ namespace EasyPrint
             btnClearAll.HighEmphasis = true;
             btnClearAll.Icon = null;
             btnClearAll.IconType = ReaLTaiizor.Controls.MaterialButton.MaterialIconType.Rebase;
-            btnClearAll.Location = new Point(266, 8);
+            btnClearAll.Location = new Point(340, 8);
             btnClearAll.Margin = new Padding(4, 6, 4, 6);
             btnClearAll.MouseState = ReaLTaiizor.Helper.MaterialDrawHelper.MaterialMouseState.HOVER;
             btnClearAll.Name = "btnClearAll";
@@ -953,7 +975,9 @@ namespace EasyPrint
         private Button                                 btnFilterPending;
         private Panel                                  panelJobActions;
         private ReaLTaiizor.Controls.MaterialButton    btnRetry;
-        private ReaLTaiizor.Controls.MaterialButton    btnClearCompleted;
+        private ReaLTaiizor.Controls.MaterialButton    btnPauseAll;
+        private ReaLTaiizor.Controls.MaterialButton    btnResumeAll;
+        private ReaLTaiizor.Controls.MaterialButton    btnCancelAll;
         private ReaLTaiizor.Controls.MaterialButton    btnClearAll;
         private DataGridView                           dgvJobs;
         private ReaLTaiizor.Controls.Panel             panelBottom;
