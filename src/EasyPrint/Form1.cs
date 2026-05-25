@@ -446,12 +446,37 @@ namespace EasyPrint
         {
             if (InvokeRequired) { Invoke(() => AddPrintJob(job)); return; }
 
+            var document = string.Concat("[EP] ", job.Id, "  ",
+                                  job.Context.AsSpan(0, Math.Min(40, job.Context.Length)));
+
+            if (_epMap.TryGetValue(job.Id, out var existing))
+            {
+                existing.JobId = 0;
+                existing.PrinterName = job.PrinterName;
+                existing.Document = document;
+                existing.UserName = "EasyPrint";
+                existing.Status = 0;
+                existing.StatusLabel = "待处理";
+                existing.StatusText = "";
+                existing.TotalPages = 0;
+                existing.PagesPrinted = 0;
+                existing.Priority = 0;
+                existing.Position = 0;
+
+                if (!_allJobs.Contains(existing))
+                    _allJobs.Insert(0, existing);
+                if (MatchesFilter(existing) && !_displayJobs.Contains(existing))
+                    _displayJobs.Insert(0, existing);
+
+                UpdateStats();
+                return;
+            }
+
             var display = new PrintQueueJob
             {
                 JobId = 0,          // 0 = EasyPrint 发起，非 Windows 队列 ID
                 PrinterName = job.PrinterName,
-                Document = string.Concat("[EP] ", job.Id, "  ",
-                                  job.Context.AsSpan(0, Math.Min(40, job.Context.Length))),
+                Document = document,
                 UserName = "EasyPrint",
                 Status = 0,
                 StatusLabel = "待处理",
@@ -495,6 +520,32 @@ namespace EasyPrint
             2 => (job.Status & 0x0002) != 0 || job.StatusLabel == "失败",     // 错误
             _ => true
         };
+
+        private bool IsEpPlaceholder(PrintQueueJob job)
+            => job.JobId == 0
+            && job.UserName == "EasyPrint"
+            && job.Document.StartsWith("[EP] ", StringComparison.Ordinal);
+
+        private PrintQueueJob? FindEpPlaceholderForPrinter(string printerName)
+            => _allJobs.FirstOrDefault(j =>
+                IsEpPlaceholder(j)
+                && j.PrinterName == printerName
+                && j.StatusLabel is "待处理" or "打印中");
+
+        private void RemoveEpPlaceholder(PrintQueueJob job, HashSet<PrintQueueJob>? displaySet = null)
+        {
+            var epKeys = _epMap
+                .Where(kvp => ReferenceEquals(kvp.Value, job))
+                .Select(kvp => kvp.Key)
+                .ToList();
+
+            foreach (var key in epKeys)
+                _epMap.Remove(key);
+
+            _allJobs.Remove(job);
+            _displayJobs.Remove(job);
+            displaySet?.Remove(job);
+        }
 
         /// <summary>重建过滤视图，批量操作时一次性刷新避免多余重绘。</summary>
         private void ApplyFilter()
@@ -965,7 +1016,8 @@ namespace EasyPrint
         /// 将新鲜任务列表与当前显示数据差量合并。
         /// <paramref name="printerFilter"/> 不为空时，只处理该打印机的条目，
         /// 保证单台同步不会误删其他打印机的任务。
-        /// EasyPrint 发起的任务（JobId == 0）始终不受影响。
+        /// 当真实 Windows 队列任务出现时，会尽量移除同打印机的 EasyPrint 占位行，
+        /// 避免同一打印任务同时显示一条“空 ID”占位行和一条真实队列行。
         /// </summary>
         private void MergePrintQueue(List<PrintQueueJob> fresh, string? printerFilter)
         {
@@ -1012,6 +1064,10 @@ namespace EasyPrint
             // 3. 新增未见过的条目
             foreach (var job in freshMap.Values)
             {
+                var placeholder = FindEpPlaceholderForPrinter(job.PrinterName);
+                if (placeholder != null)
+                    RemoveEpPlaceholder(placeholder, displaySet);
+
                 _allJobs.Insert(0, job);
                 if (MatchesFilter(job)) { _displayJobs.Insert(0, job); displaySet.Add(job); }
 

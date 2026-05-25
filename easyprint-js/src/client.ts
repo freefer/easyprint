@@ -53,6 +53,7 @@ class TypedEmitter<Events extends Record<string, unknown[]>> {
 const DEFAULTS: Required<EasyPrintOptions> = {
   host:              '127.0.0.1',
   port:              8765,
+  protocol:          'ws',
   autoReconnect:     true,
   reconnectDelay:    1_000,
   maxReconnectDelay: 30_000,
@@ -132,7 +133,7 @@ export class EasyPrintClient extends TypedEmitter<EasyPrintEventMap> {
 
   /** WebSocket 服务端地址 */
   get url(): string {
-    return `ws://${this.opts.host}:${this.opts.port}`;
+    return `${this.opts.protocol}://${this.opts.host}:${this.opts.port}`;
   }
 
   // ── 连接管理 ─────────────────────────────────────────────────────────────

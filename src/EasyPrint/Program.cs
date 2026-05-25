@@ -11,6 +11,7 @@ using SuperSocket.Server.Abstractions;
 using SuperSocket.Server.Host;
 using SuperSocket.WebSocket.Server;
 using System.Runtime;
+using System.Security.Authentication;
 
 namespace EasyPrint
 {
@@ -26,14 +27,25 @@ namespace EasyPrint
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
             var cfg = AppDataContext.LoadConfig();
-
-           var loggerProvider = new UiLoggerProvider();
+            var sslPath = Path.Combine(AppDataContext.AssemblyDirPath, cfg.SSLCertPath);
+            var loggerProvider = new UiLoggerProvider();
             var host = WebSocketHostBuilder.Create()
                 .ConfigureSuperSocket((options) =>
                 {
                     options.Name = "EasyPrintServer";
                     options.Listeners = new List<ListenOptions>() {
-                              new ListenOptions() { Ip = cfg.Ip, Port = cfg.Port }
+
+                        new ListenOptions() { Ip = cfg.Ip, Port = cfg.Port},
+                        new ListenOptions() { Ip = cfg.Ip, Port = cfg.SSLPort,
+                            AuthenticationOptions =new ServerAuthenticationOptions(){
+                                EnabledSslProtocols=SslProtocols.Tls11 |SslProtocols.Tls12|SslProtocols.Tls13,
+                                CertificateOptions=new CertificateOptions(){
+                                   FilePath=sslPath ,
+                                   Password=cfg.SSLPassword,
+                                   }
+                            }
+                         },
+
                 };
                 })
             .UseSession<EasyPrintSession>()
@@ -62,7 +74,7 @@ namespace EasyPrint
 
                 loggingBuilder.AddProvider(loggerProvider);
             });
- 
+
             var form = new Form1(cfg, host, loggerProvider);
             Application.Run(form);
         }

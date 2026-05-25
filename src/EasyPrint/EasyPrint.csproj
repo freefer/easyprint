@@ -15,7 +15,7 @@
     <PackageReference Include="ReaLTaiizor" Version="3.8.1.4" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="SuperSocket" Version="2.0.2" />
-    <PackageReference Include="SuperSocket.WebSocket.Server" Version="2.0.2" />
+    <PackageReference Include="SuperSocket.WebSocket.Server" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,6 +34,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="mkcert-192.168.2.138.pfx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="PRINT.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

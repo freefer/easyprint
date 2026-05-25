@@ -141,6 +141,7 @@ client.print({
 |--------|------|---------|-------------|
 | `host` | `string` | `'127.0.0.1'` | Server IP address |
 | `port` | `number` | `8765` | Server port |
+| `protocol` | `'ws' \| 'wss'` | `'ws'` | WebSocket protocol used to build the final URL |
 | `autoReconnect` | `boolean` | `true` | Auto-reconnect on disconnect |
 | `reconnectDelay` | `number` | `1000` | Initial reconnect delay (ms) |
 | `maxReconnectDelay` | `number` | `30000` | Max reconnect delay (ms) |

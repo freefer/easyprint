@@ -14,6 +14,14 @@ export interface EasyPrintOptions {
   /** 服务端端口，默认 8765 */
   port?: number;
   /**
+   * WebSocket 协议。
+   * - `'ws'`：使用 `ws://`
+   * - `'wss'`：使用 `wss://`
+   *
+   * 默认值：`'ws'`
+   */
+  protocol?: 'ws' | 'wss';
+  /**
    * 是否在断线后自动重连，默认 true。
    * 重连采用指数退避策略：1s → 2s → 4s → … → maxReconnectDelay
    */
